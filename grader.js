@@ -41,14 +41,19 @@ var cheerioHtmlFile = function(htmlfile) {
     return cheerio.load(fs.readFileSync(htmlfile));
 };
 
-var cheerioUrlFile = function(urlfile) {
-    var aa = rest.get(urlfile, function() {
-	var bb = aa.request['res']['rawEncoded'];
-	return bb;
-    });
-    return cheerio.load(aa);
-}
+/*
+function getContent(url, callback) {
+    rest.get(url).on('complete', function(cont) {
+	callback(cont);
+	});
+};
 
+var cheerioUrlFile = function(urlfile) {
+    var myResult = getContent(urlfile, function(cont) {                         
+    return cont;                                                                
+    });     
+};
+*/
 var loadChecks = function(checksfile) {
     return JSON.parse(fs.readFileSync(checksfile));
 };
@@ -65,14 +70,18 @@ var checkHtmlFile = function(htmlfile, checksfile) {
 };
 
 var checkUrlFile = function(urlfile, checksfile) {
-    $ = cheerioUrlFile(urlfile);
-    var checks = loadChecks(checksfile).sort();
-    var out = {};
-    for(var ii in checks) {
-        var present = $(checks[ii]).length > 0;
-        out[checks[ii]] = present;
+    var urlWords = rest.get(urlfile).on('complete', function(result) {
+	var urlHTML =  result.request['res']['rawEncoded'];
+    
+	$ = cheerio.load(urlHTML);
+	var checks = loadChecks(checksfile).sort();
+	var out = {};
+	for(var ii in checks) {
+            var present = $(checks[ii]).length > 0;
+            out[checks[ii]] = present;
     }
     return out;
+});
 };
 
 var clone = function(fn) {
