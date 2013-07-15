@@ -71,16 +71,16 @@ var checkHtmlFile = function(htmlfile, checksfile) {
 
 var checkUrlFile = function(urlfile, checksfile) {
     var urlWords = rest.get(urlfile).on('complete', function(result) {
-	var urlHTML =  result.request['res']['rawEncoded'];
-    
-	$ = cheerio.load(urlHTML);
+//	var urlHTML =  result.request['res']['rawEncoded'];
+	$ = cheerio.load(result); 
 	var checks = loadChecks(checksfile).sort();
 	var out = {};
 	for(var ii in checks) {
             var present = $(checks[ii]).length > 0;
             out[checks[ii]] = present;
     }
-    return out;
+    var outJson = JSON.stringify(out, null, 4);
+    console.log(outJson);
 });
 };
 
@@ -99,7 +99,7 @@ if(require.main == module) {
 
     if(program.url) {
 	var checkJson = checkUrlFile(program.url, program.checks);
-	var outJson = JSON.stringify(checkJson, null, 4);
+//	var outJson = JSON.stringify(checkJson, null, 4);
     console.log(outJson);
 
 }
